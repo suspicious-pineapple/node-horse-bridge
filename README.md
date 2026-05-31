@@ -1,0 +1,2 @@
+please for the love of all that is holy do not use this
+its not verified at all and handles like exactly one request type, not all sampling parameters are implemented, heck im not sure if it even is possible to get full compliance the way i want to
