@@ -12,16 +12,20 @@ let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
 console.log(userDetails);
 let available = true;
 setInterval(async ()=>{
-    let polled =await popRequest() 
-    console.log(polled);
-
-    if(polled.payload &&available&&polled.id){
+    if(available){
         available=false;
-        let generated = await completionsRequest(polled.payload);
-        console.log(await submitRequest(polled.id,generated))
+
+        let polled =await popRequest() 
+        console.log(polled.id);
+        
+        if(polled.payload &&polled.id){
+            let generated = await completionsRequest(polled.payload);
+            console.log("generated:",generated.length);
+            console.log(await submitRequest(polled.id,generated))
+        }
         available=true;
     }
-},1000)
+},1500)
 
 async function completionsRequest(payload){
     let body = payload;
