@@ -15,36 +15,25 @@ let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
 
 })).json();
 console.log(userDetails);
+let available = true;
 setInterval(async ()=>{
     
     let polled =await popRequest() 
     console.log(polled);
 
-    if(polled.payload){
+    if(polled.payload &&available){
+        available=false;
         let generated = await completionsRequest(polled.payload);
         console.log(await submitRequest(polled.id,generated))
+        available=true;
     }
-},3000)
+},1000)
 
 async function completionsRequest(payload){
-    let body = {
-        'prompt': payload.prompt,
-        'max_tokens': payload.max_length,
-        'n': 1,
-        'seed': -1,
-        'add_bos_token': true,
-        'ban_eos_token': false,
-        'skip_special_tokens': false,
-        'stop': payload.stop_sequence,
-        "min_p":payload.min_p,
-        "top_k":payload.top_k,
-        "top_p":payload.top_p,
-        "temperature":payload.temperature,
-    }
+    let body = payload;
     let headers = {
         "Content-Type": "application/json",
     };
-
     let response = await fetch(config.oai_url+"v1/completions", {
         method: 'POST',
         headers: headers,
@@ -82,9 +71,7 @@ let response = await fetch("https://aihorde.net/api/v2/generate/text/pop",{
     },
     body: JSON.stringify(body)});
     return await response.json();
-
 }
-
 async function submitRequest(id,message){
     let body = {
         id:id,
@@ -101,7 +88,6 @@ let response = await fetch("https://aihorde.net/api/v2/generate/text/submit",{
     },
     body: JSON.stringify(body)});
     return await response.json();
-
 }
 
 
