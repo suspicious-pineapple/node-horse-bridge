@@ -1,9 +1,5 @@
 import fs from "fs";
-
-
 let config = JSON.parse(fs.readFileSync("./config.json",{encoding:"utf-8"}));
-
-
 const agent = "pineapple_bridge";
 
 let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
@@ -12,16 +8,14 @@ let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
         "apikey":config.horde_key,
         "Client-Agent":agent
     }
-
 })).json();
 console.log(userDetails);
 let available = true;
 setInterval(async ()=>{
-    
     let polled =await popRequest() 
     console.log(polled);
 
-    if(polled.payload &&available){
+    if(polled.payload &&available&&polled.id){
         available=false;
         let generated = await completionsRequest(polled.payload);
         console.log(await submitRequest(polled.id,generated))
@@ -57,7 +51,7 @@ async function popRequest(){
   "threads": 1,
   "require_upfront_kudos": false,
   "amount": 1,
-  "extra_slow_worker": true,
+  "extra_slow_worker": false,
   "max_length": config.max_seq_len,
   "max_context_length": config.max_seq_len,
   "softprompts": []
@@ -89,5 +83,3 @@ let response = await fetch("https://aihorde.net/api/v2/generate/text/submit",{
     body: JSON.stringify(body)});
     return await response.json();
 }
-
-
