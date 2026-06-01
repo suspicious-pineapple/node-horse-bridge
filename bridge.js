@@ -10,23 +10,42 @@ let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
     }
 })).json();
 console.log(userDetails);
-let slots = 1;
+let slots = 4;
 let available = true;
-setInterval(async ()=>{
-    if(slots > 0){
-        slots-=1;
+let pollInterval = 2000;
 
-        let polled =await popRequest() 
-        console.log(polled.id);
-        
-        if(polled.payload &&polled.id){
-            let generated = await completionsRequest(polled.payload);
-            console.log("generated:",generated.length);
-            console.log(await submitRequest(polled.id,generated))
-        }
-        slots++;
+function boostRate(){
+    pollInterval = 500;
+    setTimeout(()=>{
+        pollInterval=2000;
+    },5000)
+}
+
+async function loop(){
+    console.log(slots);
+    if(slots > 0){
+        (async ()=>{
+            slots-=1;
+
+            let polled =await popRequest() 
+            console.log(polled.id);
+            
+            if(polled.payload &&polled.id){
+                let generated = await completionsRequest(polled.payload);
+                console.log("generated:",generated);
+                console.log(await submitRequest(polled.id,generated.length));
+                boostRate();
+            }
+            slots++;
+        })();
     }
-},1000)
+
+    setTimeout(loop,pollInterval);
+}
+
+loop()
+
+
 
 async function completionsRequest(payload){
     let body = payload;
@@ -53,7 +72,7 @@ async function popRequest(){
     config.model_name
   ],
   "bridge_agent": agent,
-  "threads": 1,
+  "threads": 4,
   "require_upfront_kudos": false,
   "amount": 1,
   "extra_slow_worker": false,
