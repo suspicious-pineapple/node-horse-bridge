@@ -52,7 +52,7 @@ async function completionsRequest(payload){
     let headers = {
         "Content-Type": "application/json",
     };
-    let response = await fetch(config.oai_url+"v1/completions", {
+    let response = await fetch(config.kai_url+"v1/completions", {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(body)
