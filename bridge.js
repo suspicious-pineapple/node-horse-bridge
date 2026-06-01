@@ -10,7 +10,7 @@ let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
     }
 })).json();
 console.log(userDetails);
-let slots = 4;
+let slots = 1;
 let available = true;
 let pollInterval = 2000;
 
@@ -32,8 +32,8 @@ async function loop(){
             
             if(polled.payload &&polled.id){
                 let generated = await completionsRequest(polled.payload);
-                console.log("generated:",generated);
-                console.log(await submitRequest(polled.id,generated.length));
+                console.log("generated:",generated.length);
+                console.log(await submitRequest(polled.id,generated));
                 boostRate();
             }
             slots++;
@@ -72,7 +72,7 @@ async function popRequest(){
     config.model_name
   ],
   "bridge_agent": agent,
-  "threads": 4,
+  "threads": 1,
   "require_upfront_kudos": false,
   "amount": 1,
   "extra_slow_worker": false,
