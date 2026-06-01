@@ -10,10 +10,11 @@ let userDetails = await (await fetch("https://aihorde.net/api/v2/find_user",{
     }
 })).json();
 console.log(userDetails);
+let slots = 1;
 let available = true;
 setInterval(async ()=>{
-    if(available){
-        available=false;
+    if(slots > 0){
+        slots-=1;
 
         let polled =await popRequest() 
         console.log(polled.id);
@@ -23,9 +24,9 @@ setInterval(async ()=>{
             console.log("generated:",generated.length);
             console.log(await submitRequest(polled.id,generated))
         }
-        available=true;
+        slots++;
     }
-},1500)
+},1000)
 
 async function completionsRequest(payload){
     let body = payload;
@@ -71,11 +72,22 @@ let response = await fetch("https://aihorde.net/api/v2/generate/text/pop",{
     return await response.json();
 }
 async function submitRequest(id,message){
+
+    let meta = [];
+
+
+    if(message.toLowerCase().includes("csam") || message.toLowerCase().includes("of minors")){
+        meta.push({type:"censorship", value:"csam"})
+        message = "Please don't do that.";
+        console.log("filter hit :( why are people like this");
+    }
+
+
     let body = {
         id:id,
         generation:message,
         state:"ok",
-        gen_metadata:[],
+        gen_metadata:meta,
 }
 let response = await fetch("https://aihorde.net/api/v2/generate/text/submit",{
     method: "POST",
